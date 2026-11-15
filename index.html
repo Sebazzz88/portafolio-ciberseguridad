@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sebastián Rivera · Ciberseguridad Ofensiva</title>
+<meta name="description" content="Portafolio de Sebastián Rivera, bachiller en Tecnología y entusiasta de ciberseguridad ofensiva: pentesting, ingeniería social, CTF y bug bounty.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --tint:#9aa0a6;          /* color de la lluvia de caracteres */
+    --bg:#08080a;
+    --accent:#8ef0a8;
+    --ink:#e6e9ec;
+    --muted:#9aa0a6;
+    --line:rgba(170,176,182,.18);
+    --card:rgba(14,15,17,.66);
+  }
+  *{box-sizing:border-box}
+  html{background:var(--bg);scroll-behavior:smooth}
+  body{margin:0;min-height:100vh;background:transparent;color:#d7dadd;
+    font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:rgba(142,240,168,.28);color:#fff}
+
+  /* ===== FONDO ANIMADO ===== */
+  .hacker-bg{
+    position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 30%,#17181b 0%,#0b0b0d 55%,#060607 100%);
+  }
+  .hacker-bg .grid{
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(190,195,200,.07) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(190,195,200,.07) 1px,transparent 1px);
+    background-size:56px 56px;
+    animation:gridDrift 14s linear infinite;
+  }
+  @keyframes gridDrift{to{background-position:56px 56px}}
+
+  .hacker-bg .floorWrap{
+    position:absolute;left:-20%;right:-20%;bottom:0;height:46%;perspective:420px;
+    -webkit-mask-image:linear-gradient(to top,#000 10%,transparent 95%);
+            mask-image:linear-gradient(to top,#000 10%,transparent 95%);
+  }
+  .hacker-bg .floor{
+    position:absolute;inset:0;transform:rotateX(62deg);transform-origin:50% 100%;
+    background-image:
+      linear-gradient(rgba(200,205,210,.22) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(200,205,210,.22) 1px,transparent 1px);
+    background-size:70px 70px;
+    animation:floorMove 3.2s linear infinite;
+  }
+  @keyframes floorMove{to{background-position:0 70px}}
+
+  .hacker-bg .scanbar{
+    position:absolute;left:0;right:0;top:-160px;height:160px;
+    background:linear-gradient(to bottom,transparent,rgba(210,214,218,.07),transparent);
+    animation:scan 8s linear infinite;
+  }
+  @keyframes scan{to{transform:translateY(calc(100vh + 320px))}}
+
+  .hacker-bg .glitch{
+    position:absolute;left:0;right:0;height:3px;background:rgba(220,224,228,.16);
+    opacity:0;animation:glitch 6.5s steps(1) infinite;
+  }
+  @keyframes glitch{
+    0%{opacity:0;top:22%} 60%{opacity:0;top:22%}
+    61%{opacity:1;top:31%} 62%{opacity:0;top:31%}
+    63%{opacity:1;top:64%;transform:translateX(30px)} 64%{opacity:0;top:64%;transform:none}
+    100%{opacity:0}
+  }
+
+  .hacker-bg .lines{
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(to bottom,rgba(0,0,0,.34) 0,rgba(0,0,0,.34) 1px,transparent 1px,transparent 3px);
+    animation:flicker 5s steps(1) infinite;
+  }
+  @keyframes flicker{0%{opacity:.9}7%{opacity:.7}8%{opacity:.95}46%{opacity:.9}47%{opacity:.6}48%{opacity:.92}100%{opacity:.9}}
+
+  .hacker-bg .vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 45%,rgba(8,8,10,0) 30%,rgba(8,8,10,.55) 70%,rgba(4,4,5,.95) 100%);
+  }
+
+  @keyframes blink{50%{opacity:0}}
+
+  @media (prefers-reduced-motion:reduce){
+    .hacker-bg *{animation:none!important}
+  }
+  /* ===== FIN DEL FONDO ===== */
+
+  /* ===== LAYOUT ===== */
+  .wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* nav */
+  .nav{
+    position:sticky;top:0;z-index:20;
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    background:linear-gradient(to bottom,rgba(8,8,10,.82),rgba(8,8,10,.34));
+  }
+  .navIn{max-width:1080px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:18px}
+  .brand{display:flex;align-items:center;gap:9px;font-size:13px;letter-spacing:.02em;color:var(--ink);text-decoration:none;white-space:nowrap}
+  .brand b{font-weight:500}
+  .brand .prompt{color:var(--accent)}
+  .navLinks{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+  .navLinks a{
+    color:var(--muted);text-decoration:none;font-size:12px;padding:6px 10px;transition:.18s;
+  }
+  .navLinks a:hover{color:var(--ink)}
+  .navLinks a.cta{color:var(--accent);font-weight:500}
+  .navLinks a.cta:hover{color:#b7ffca}
+  @media (max-width:820px){.navLinks a:not(.cta){display:none}}
+
+  /* hero */
+  header.hero{padding:clamp(46px,9vw,92px) 0 clamp(30px,5vw,52px)}
+
+  h1{
+    font-size:clamp(38px,7.4vw,72px);line-height:1.02;margin:0;
+    font-weight:500;letter-spacing:-.035em;color:#f2f4f6;
+  }
+  h1 .sub{display:block;color:var(--muted);font-size:clamp(15px,2.4vw,22px);letter-spacing:-.01em;margin-top:14px}
+  .type{color:var(--accent)}
+  .type .caret{display:inline-block;width:.6ch;background:var(--accent);animation:blink 1.1s steps(1) infinite;color:transparent}
+  .lede{max-width:62ch;color:#b3b8bd;font-size:14.5px;line-height:1.75;margin:22px 0 0}
+
+  .heroGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:34px;align-items:start}
+  @media (max-width:900px){.heroGrid{grid-template-columns:1fr}}
+
+  /* bloque de perfil (sin marco) */
+  .termCard{padding-top:2px}
+  .termCard pre{
+    margin:0;padding:0;font-size:12.5px;line-height:1.9;color:#b9bec3;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .termCard .k{color:var(--accent)}
+  .termCard .m{color:#7c8288}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:38px}
+  @media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{padding:0}
+  .stat b{display:block;font-size:clamp(20px,3vw,26px);font-weight:500;color:#f2f4f6;letter-spacing:-.02em}
+  .stat span{display:block;font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
+
+  /* sections */
+  section{padding:clamp(34px,5.2vw,54px) 0}
+  .secHead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+  .secNum{font-size:11.5px;color:var(--accent);letter-spacing:.14em}
+  h2{font-size:clamp(21px,3.4vw,30px);font-weight:500;letter-spacing:-.025em;margin:0;color:#eef1f3}
+  .secHead p{margin:0;color:var(--muted);font-size:12.5px;margin-left:auto}
+  @media (max-width:640px){.secHead p{margin-left:0;width:100%}}
+
+  /* about */
+  .about{display:grid;grid-template-columns:1.4fr .6fr;gap:32px}
+  @media (max-width:820px){.about{grid-template-columns:1fr}}
+  .about p{font-size:14px;line-height:1.85;color:#b3b8bd;margin:0 0 14px}
+  .about strong{color:#eef1f3;font-weight:500}
+  .kv{padding-left:0}
+  @media (max-width:820px){.kv{padding-left:0;padding-top:0}}
+  .kv div{display:flex;justify-content:space-between;gap:14px;padding:7px 0;font-size:12.5px}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;color:#dfe3e6;text-align:right}
+
+  /* projects */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media (max-width:820px){.cards{grid-template-columns:1fr}}
+  .card{position:relative;padding:0;transition:transform .22s ease}
+  .card:hover{transform:translateY(-3px)}
+  .card:hover h3{color:var(--accent)}
+  .card .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .card h3{margin:0;font-size:15px;font-weight:500;color:#f2f4f6;letter-spacing:-.01em;transition:color .22s ease}
+  .card .badge{
+    margin-left:auto;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+    padding:0;white-space:nowrap;opacity:.85;
+  }
+  .card p{margin:0 0 14px;font-size:12.8px;line-height:1.75;color:#a8aeb3}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{
+    font-size:10.5px;color:#a9afb5;padding:0;letter-spacing:.02em;
+  }
+  .tag::before{content:"#";color:rgba(142,240,168,.55);margin-right:1px}
+
+  /* timeline */
+  .tl{margin:0;padding:0;list-style:none}
+  .tl li{padding:0 0 30px}
+  .tl li:last-child{padding-bottom:0}
+  .tl h3{margin:0 0 6px;font-size:14.5px;font-weight:500;color:#eef1f3;letter-spacing:-.01em}
+  .tl h3 em{font-style:normal;color:var(--muted);font-size:12px;font-weight:400;display:block;margin-top:3px}
+  .tl p{margin:0;font-size:12.8px;line-height:1.8;color:#a8aeb3}
+  .tl .hl{color:var(--accent)}
+
+  /* certifications */
+  .certs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:820px){.certs{grid-template-columns:1fr}}
+  .cert{padding:0}
+  .cert .org{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .cert h3{margin:8px 0 0;font-size:13.5px;font-weight:500;color:#eef1f3;line-height:1.45}
+  .cert .yr{display:inline-block;margin-top:10px;font-size:11px;color:var(--accent)}
+
+  /* skills */
+  .skillGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media (max-width:820px){.skillGrid{grid-template-columns:1fr}}
+  .skillBox{padding:0}
+  .skillBox h3{margin:0 0 12px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#cfd4d8;font-weight:500}
+  .skillBox .tags .tag{padding:0;font-size:11px}
+
+  /* contact */
+  .contactBox{padding:0}
+  .contactBox h2{font-size:clamp(22px,4vw,32px)}
+  .contactBox p{color:#a8aeb3;font-size:13.5px;line-height:1.8;max-width:56ch;margin:12px 0 22px}
+  .contactLinks{display:flex;flex-wrap:wrap;gap:14px 28px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:12.5px;
+    padding:3px 0;color:#dfe3e6;transition:.18s;
+    box-shadow:inset 0 -1px 0 rgba(170,176,182,.32);
+  }
+  .btn:hover{color:var(--accent);box-shadow:inset 0 -1px 0 rgba(142,240,168,.9);transform:translateY(-1px)}
+  .btn.primary{color:var(--accent);box-shadow:inset 0 -1px 0 rgba(142,240,168,.45)}
+  .btn.primary:hover{color:#b7ffca;box-shadow:inset 0 -1px 0 #b7ffca}
+  .btn svg{width:15px;height:15px;flex:none}
+
+  footer{padding:26px 0 40px}
+  .footIn{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  footer p{margin:0;font-size:11.5px;color:#7c8288;letter-spacing:.02em}
+  footer .sig{color:var(--accent)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+</style>
+</head>
+<body>
+
+<div class="hacker-bg" aria-hidden="true">
+  <div class="grid"></div>
+  <div class="floorWrap"><div class="floor"></div></div>
+  <div class="scanbar"></div>
+  <div class="glitch"></div>
+
+  <div class="lines"></div>
+  <div class="vignette"></div>
+</div>
+
+<nav class="nav">
+  <div class="navIn">
+    <a class="brand" href="#top"><span class="prompt">~$</span><b>sebastian rivera</b></a>
+    <div class="navLinks">
+      <a href="#sobre">Sobre mí</a>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#logros">Logros</a>
+      <a href="#skills">Skills</a>
+      <a class="cta" href="#contacto">Contacto</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+
+  <header class="hero">
+    <div class="heroGrid">
+      <div>
+        <h1>
+          Sebastián Rivera
+          <span class="sub">Ciberseguridad ofensiva · <span class="type" id="typed">pentesting</span><span class="type caret">|</span></span>
+        </h1>
+        <p class="lede">
+          Bachiller en Tecnología formado de manera autodidacta en seguridad ofensiva, con especial interés
+          en <strong style="color:#eef1f3;font-weight:500">ingeniería social</strong>. Practico en laboratorios,
+          CTF y bug bounty, y construyo mis propias herramientas de seguridad: desde un mini-SIEM hasta una
+          distro Linux para pentesting.
+        </p>
+
+        <div class="stats">
+          <div class="stat"><b>7.º</b><span>CTF Nacional de Panamá · mejor posición académica</span></div>
+          <div class="stat"><b>61</b><span>retos resueltos en 36 h de competencia</span></div>
+          <div class="stat"><b>P1</b><span>CVE reportado en Keycloak vía Bugcrowd</span></div>
+          <div class="stat"><b>4+</b><span>proyectos de seguridad y apps publicadas</span></div>
+        </div>
+      </div>
+
+      <div class="termCard">
+<pre><span class="m"># perfil</span>
+<span class="k">nombre:</span> Sebastián Rivera
+<span class="k">rol:</span> seguridad ofensiva
+<span class="k">base:</span> David, Chiriquí, Panamá
+<span class="k">enfoque:</span>
+  - pentesting / ethical hacking
+  - ingeniería social
+  - detección &amp; respuesta (SIEM)
+<span class="k">idiomas:</span> español (nativo), inglés (básico)
+<span class="k">estado:</span> abierto a oportunidades
+<span class="k">github:</span> /Sebazz88
+<span class="k">ctf:</span> 7.º nacional · categoría académica
+</pre>
+      </div>
+    </div>
+  </header>
+
+  <section id="sobre" class="reveal">
+    <div class="secHead">
+      <span class="secNum">01 /</span>
+      <h2>Sobre mí</h2>
+      <p>// perfil profesional</p>
+    </div>
+    <div class="about">
+      <div>
+        <p>
+          Bachiller en Tecnología con formación autodidacta en ciberseguridad ofensiva. Mi interés principal
+          está en la <strong>ingeniería social</strong>: entender cómo piensa una persona es, muchas veces, el
+          camino más corto hacia un sistema.
+        </p>
+        <p>
+          Me formo de forma práctica: laboratorios propios con VirtualBox, Kali Linux, Metasploitable 2 y
+          Windows 7, retos de HackTheBox y competencias nacionales de CTF. Esa misma curiosidad me llevó a
+          desarrollar herramientas propias, como un <strong>mini-SIEM</strong> con reglas de detección y alertas
+          en tiempo real, y una <strong>distro Linux orientada a pentesting</strong>.
+        </p>
+        <p>
+          Documento cada hallazgo como si fuera para un cliente: reproducción en laboratorio, evidencia y
+          reporte técnico. Creo que un bug sin reporte claro es un bug a medias.
+        </p>
+      </div>
+      <dl class="kv">
+        <div><dt>Ubicación</dt><dd>David, Chiriquí, PA</dd></div>
+        <div><dt>Educación</dt><dd>Bachiller en Tecnología</dd></div>
+        <div><dt>Enfoque</dt><dd>Ofensivo / Red Team</dd></div>
+        <div><dt>Interés</dt><dd>Ingeniería social</dd></div>
+        <div><dt>Idiomas</dt><dd>ES nativo · EN básico</dd></div>
+        <div><dt>Estado</dt><dd style="color:var(--accent)">Disponible</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="proyectos" class="reveal">
+    <div class="secHead">
+      <span class="secNum">02 /</span>
+      <h2>Proyectos</h2>
+      <p>// cosas que construí para aprender y para atacar mejor</p>
+    </div>
+    <div class="cards">
+
+      <article class="card">
+        <div class="top"><h3>Mini-SIEM</h3><span class="badge">Seguridad</span></div>
+        <p>
+          Recolector de logs de SSH, Apache/Nginx y UFW con almacenamiento en SQLite y reglas de detección
+          para fuerza bruta, escaneo de puertos, picos de 404 e inyección SQL. Panel web en Flask con login,
+          alertas por Telegram y pruebas unitarias.
+        </p>
+        <div class="tags"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">SQLite</span><span class="tag">Detección</span><span class="tag">Telegram API</span></div>
+      </article>
+
+      <article class="card">
+        <div class="top"><h3>Distro Linux para pentesting</h3><span class="badge">Herramienta</span></div>
+        <p>
+          Distribución Linux propia orientada a pruebas de penetración: selección de herramientas, ajustes de
+          entorno y configuración pensada para trabajo ofensivo rápido en laboratorio.
+        </p>
+        <div class="tags"><span class="tag">Linux</span><span class="tag">Pentesting</span><span class="tag">Entorno ofensivo</span></div>
+      </article>
+
+      <article class="card">
+        <div class="top"><h3>Laboratorio de pentesting</h3><span class="badge">Lab</span></div>
+        <p>
+          Entorno aislado con VirtualBox, Kali Linux, Metasploitable 2 y Windows 7 para practicar enumeración,
+          explotación y post-explotación de forma segura y reproducible.
+        </p>
+        <div class="tags"><span class="tag">VirtualBox</span><span class="tag">Kali Linux</span><span class="tag">Metasploitable 2</span><span class="tag">Windows 7</span></div>
+      </article>
+
+      <article class="card">
+        <div class="top"><h3>Agendita</h3><span class="badge">App Android</span></div>
+        <p>
+          Aplicación de recordatorios de tareas donde los avisos llegan según la prioridad, incluso con la app
+          cerrada. APK descargable para Android.
+        </p>
+        <div class="tags"><span class="tag">Android</span><span class="tag">Notificaciones</span><span class="tag">APK</span></div>
+      </article>
+
+      <article class="card">
+        <div class="top"><h3>Codi</h3><span class="badge">App Android</span></div>
+        <p>
+          App para aprender programación estilo Duolingo: 10 lenguajes, sistema de XP, vidas y racha diaria
+          para mantener el hábito. APK descargable para Android.
+        </p>
+        <div class="tags"><span class="tag">Android</span><span class="tag">Gamificación</span><span class="tag">Educación</span></div>
+      </article>
+
+      <article class="card">
+        <div class="top"><h3>Nexo</h3><span class="badge">IA · HackIAthon</span></div>
+        <p>
+          Copiloto editorial con IA desarrollado en hackIAthon Panamá 2026 (TVN): agrupa noticias, verifica
+          fuentes y redacta borradores con citas, incluyendo defensas contra prompt injection.
+        </p>
+        <div class="tags"><span class="tag">FastAPI</span><span class="tag">React</span><span class="tag">Ollama</span><span class="tag">Prompt Injection</span></div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="logros" class="reveal">
+    <div class="secHead">
+      <span class="secNum">03 /</span>
+      <h2>Experiencia y logros</h2>
+      <p>// competencia, investigación y divulgación</p>
+    </div>
+    <ul class="tl">
+      <li>
+        <h3>CTF Nacional de Ciberseguridad de Panamá — 3.ª edición
+          <em>7.º lugar general · mejor posición de la categoría académica</em></h3>
+        <p>
+          Competí contra los sectores público, privado y académico. Resolví <span class="hl">61 retos</span> de
+          forense, esteganografía, reversing y criptografía en <span class="hl">36 horas</span>, apoyándome en
+          herramientas de IA para acelerar el análisis.
+        </p>
+      </li>
+      <li>
+        <h3>Bugcrowd — CVE-2026-4282 <em>Keycloak · Authentication Bypass · severidad P1</em></h3>
+        <p>
+          Reportado en un programa público. Reproduje el exploit en laboratorio Docker/Kali, obtuve un access
+          token forjado y confirmé el endpoint vulnerable en el objetivo real. Reporte en revisión. También
+          practico reconocimiento pasivo, análisis de CVE y prompt injection en chatbots de IA.
+        </p>
+      </li>
+      <li>
+        <h3>hackIAthon Panamá 2026 — TVN <em>Desarrollo de producto con IA</em></h3>
+        <p>
+          Construí <span class="hl">Nexo</span>, un copiloto editorial con IA (FastAPI, React, Ollama) que agrupa
+          noticias, verifica fuentes y redacta borradores con citas, con defensas activas contra prompt injection.
+        </p>
+      </li>
+      <li>
+        <h3>HackTheBox <em>Práctica continua · Cyber Apocalypse CTF 2026</em></h3>
+        <p>
+          Resolución de máquinas y retos de forma constante, incluyendo explotación de
+          <span class="hl">Stored XSS</span> durante Cyber Apocalypse CTF 2026.
+        </p>
+      </li>
+      <li>
+        <h3>HackRocks <em>Explotación de kernel</em></h3>
+        <p>Vulneré un kernel Linux 2.0 durante el evento.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section id="certs" class="reveal">
+    <div class="secHead">
+      <span class="secNum">04 /</span>
+      <h2>Certificaciones</h2>
+      <p>// formación continua</p>
+    </div>
+    <div class="certs">
+      <div class="cert">
+        <span class="org">Cisco Networking Academy</span>
+        <h3>Ethical Hacker</h3>
+        <span class="yr">2026</span>
+      </div>
+      <div class="cert">
+        <span class="org">Cisco Networking Academy</span>
+        <h3>Introduction to Cybersecurity · Linux Unhatched</h3>
+        <span class="yr">Completado</span>
+      </div>
+      <div class="cert">
+        <span class="org">ISC2</span>
+        <h3>Certified in Cybersecurity (CC)</h3>
+        <span class="yr">En preparación</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="reveal">
+    <div class="secHead">
+      <span class="secNum">05 /</span>
+      <h2>Habilidades</h2>
+      <p>// técnicas y profesionales</p>
+    </div>
+    <div class="skillGrid">
+      <div class="skillBox">
+        <h3>Pentesting y hacking ético</h3>
+        <div class="tags">
+          <span class="tag">Penetration Testing</span><span class="tag">Ethical Hacking</span>
+          <span class="tag">Vulnerability Assessment</span><span class="tag">Vulnerability Scanning</span>
+          <span class="tag">Pentesting Tools</span>
+        </div>
+      </div>
+      <div class="skillBox">
+        <h3>Explotación y evaluación</h3>
+        <div class="tags">
+          <span class="tag">Exploiting Applications</span><span class="tag">Exploiting Networks</span>
+          <span class="tag">IoT Security</span><span class="tag">Social Engineering</span>
+        </div>
+      </div>
+      <div class="skillBox">
+        <h3>Documentación</h3>
+        <div class="tags">
+          <span class="tag">Reporting</span><span class="tag">Reproducción de hallazgos</span>
+          <span class="tag">Evidencia técnica</span>
+        </div>
+      </div>
+      <div class="skillBox">
+        <h3>Habilidades profesionales</h3>
+        <div class="tags">
+          <span class="tag">Resolución de problemas</span><span class="tag">Análisis metódico</span>
+          <span class="tag">Colaboración</span><span class="tag">Comunicación clara</span>
+          <span class="tag">Autodidacta</span><span class="tag">Atención al detalle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto" class="reveal">
+    <div class="contactBox">
+      <div class="secHead" style="margin-bottom:6px">
+        <span class="secNum">06 /</span>
+        <h2>Hablemos</h2>
+      </div>
+      <p>
+        Abierto a prácticas, roles junior en seguridad ofensiva, colaboraciones en CTF o cualquier proyecto
+        donde el objetivo sea encontrar la falla antes que el atacante.
+      </p>
+      <div class="contactLinks">
+        <a class="btn primary" href="/cdn-cgi/l/email-protection#255640474456514c44404b574c545040574c534057441417654248444c490b464a48">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          Enviar correo
+        </a>
+        <a class="btn" href="https://github.com/Sebazz88" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A12 12 0 0 0 0 12.7c0 5.4 3.4 10 8.2 11.6.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.9 2.8 1.4 3.5 1 .1-.8.4-1.4.8-1.7-2.7-.3-5.5-1.4-5.5-6 0-1.3.5-2.4 1.2-3.3-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C18.2 4.3 19.2 4.6 19.2 4.6c.6 1.6.2 2.9.1 3.2.8.9 1.2 2 1.2 3.3 0 4.6-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 24 12.7 12 12 0 0 0 12 .5Z"/></svg>
+          github.com/Sebazz88
+        </a>
+        <a class="btn" href="https://www.linkedin.com/in/sebasti%C3%A1n-rivera-8baa62395/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.1c.5-.9 1.8-1.9 3.7-1.9 4 0 4.7 2.5 4.7 5.7V21h-4v-5.8c0-1.4 0-3.2-2-3.2s-2.3 1.5-2.3 3.1V21H9V9Z"/></svg>
+          LinkedIn
+        </a>
+        <a class="btn" href="tel:65806767">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a1 1 0 0 1-1 1A17 17 0 0 1 3 5a1 1 0 0 1 1-1Z"/></svg>
+          6580-6767
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footIn">
+      <p><span class="sig">sebastian@portfolio</span>:~$ <span id="footTyped">echo "gracias por pasar"</span></p>
+      <p>David, Chiriquí, Panamá · <span id="year">2026</span></p>
+    </div>
+  </footer>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  /* ---- texto que se escribe solo ---- */
+  (function(){
+    var el = document.getElementById('typed');
+    if (!el) return;
+    var words = ['pentesting','ingeniería social','análisis de vulnerabilidades','CTF & bug bounty','detección de intrusos'];
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce){ el.textContent = words[0]; return; }
+    var w = 0, i = 0, deleting = false;
+    function tick(){
+      var word = words[w];
+      if (!deleting){
+        i++;
+        el.textContent = word.slice(0, i);
+        if (i === word.length){ deleting = true; return setTimeout(tick, 1600); }
+        return setTimeout(tick, 62);
+      }
+      i--;
+      el.textContent = word.slice(0, i);
+      if (i === 0){ deleting = false; w = (w + 1) % words.length; return setTimeout(tick, 260); }
+      setTimeout(tick, 30);
+    }
+    setTimeout(tick, 500);
+  })();
+
+  /* ---- aparición al hacer scroll ---- */
+  (function(){
+    var items = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)){ items.forEach(function(n){ n.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    items.forEach(function(n){ io.observe(n); });
+  })();
+
+  /* ---- año ---- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5a85c296b84214c',t:'MTc5NDY4Mzg4NQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5a85c296b84214c',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
